@@ -83,6 +83,11 @@ public class Vector
                 -y,    x,  0.0).multiply (v);  
   }
   
+  public void print (String name)
+  {
+    System.out.printf("\n%s = \n %8.4f %8.4f %8.4f\n", name, x, y, z);
+  }
+  
   public float x, y, z;  
 }
 

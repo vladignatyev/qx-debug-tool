@@ -84,9 +84,7 @@ class MassPoint
   }
   
   float mass;
-  Vector position;
-  Vector velocity;
-  Vector appliedForce;
+  public Vector position, velocity, appliedForce;
 }
 
 class InertialObject extends MassPoint
@@ -94,13 +92,14 @@ class InertialObject extends MassPoint
   InertialObject(float mass, Vector position, float ix, float iy, float iz)
   {
     super(mass, position);
-    this.ix = ix;
-    this.iy = iy;
-    this.iz = iz;
-    angles = new Vector(0.0,0.0,0.0);
-    angularSpeeds = new Vector(0.0,0.0,0.0);
-    localMomentum = new Vector(0.0,0.0,0.0);
-    localForce = new Vector(0.0, 0.0, 0.0);
+    inertiaMatrix = new Matrix(1.0 / ix, 0.0, 0.0,
+                               0.0, 1.0 / iy, 0.0,
+                               0.0, 0.0, 1.0 / iz);
+    angles = new Vector();
+    angularSpeeds = new Vector();
+    localMomentum = new Vector();
+    appliedMomentum = new Vector();
+    localForce = new Vector();
   }
   
   void clean()
@@ -114,6 +113,10 @@ class InertialObject extends MassPoint
     localForce.x = 0.0;
     localForce.y = 0.0;
     localForce.z = 0.0;
+    
+    appliedMomentum.x = 0.0;
+    appliedMomentum.y = 0.0;
+    appliedMomentum.z = 0.0;
   }
   
   void applyLocalForce(Vector force) // force in global CS
@@ -126,30 +129,35 @@ class InertialObject extends MassPoint
     updateCS();
     
     position.add(velocity.add(appliedForce.scaleBy(deltaTime * deltaTime / mass)));
-    position.add(velocity.add(localForce.multiplied(coordinateSystem).scaleBy(deltaTime * deltaTime / mass)));
+    position.add(velocity.add((localForce.multiplied(coordinateSystem)).scaleBy(deltaTime * deltaTime / mass)));
     
-    final float omegaX = localMomentum.x / ix;
-    final float omegaY = localMomentum.y / iy;
-    final float omegaZ = localMomentum.z / iz;
+    angularSpeeds.add((appliedMomentum.multiplied(inertiaMatrix)).scaledBy(deltaTime));
+    angularSpeeds.add(((localMomentum.multiplied(coordinateSystem)).multiplied(inertiaMatrix)).scaleBy(deltaTime));
     
-    angularSpeeds.add(new Vector(omegaX, omegaY, omegaZ).scaleBy(deltaTime));
     angles.add(angularSpeeds.scaledBy(deltaTime));
+    
+    angles.print("angles");
   }
   
   void applyLocalMomentum(Vector momentum)
   {
     localMomentum.add(momentum);
+  }
+ 
+  void applyMomentum(Vector momentum)
+  {
+    appliedMomentum.add(momentum);
   } 
   
   void drawUp(float size)
   {
     pushMatrix();
       translate(position.x, position.y, position.z);
-      Vector localUp = new Vector(0, -1, 0);
-      Vector globalUp = localUp.multiplied(coordinateSystem).scaleBy(size);
+      Vector localUp = new Vector(0.0, -1.0, 0.0);
+      Vector globalUp = (coordinateSystem.multiply(localUp)).scaleBy(size);
       noFill();
       beginShape(LINES);
-        stroke(1.0, 0.0, 0.0);
+        stroke(0.0, 1.0, 0.0);
         vertex(0.0, 0.0, 0.0);
         vertex(globalUp.x, globalUp.y, globalUp.z);
         vertex(globalUp.x, globalUp.y, globalUp.z);
@@ -161,9 +169,9 @@ class InertialObject extends MassPoint
   {
     pushMatrix();
       translate(position.x, position.y, position.z);
-      rotateX(angles.x);
-      rotateY(angles.y);
-      rotateZ(angles.z);
+      rotateX(-angles.x);
+      rotateY(-angles.y);
+      rotateZ(-angles.z);
       beginShape(QUADS);
         stroke(1.0,1.0,1.0, 1.0);
         fill(r,g,b,0.1);  
@@ -230,21 +238,22 @@ class InertialObject extends MassPoint
     Matrix mz = new Matrix();
     mz.rotationZ(angles.z);
     
-    // mx*my*mz
+    
     mx.multiplyBy(my);
     mx.multiplyBy(mz);
     
     coordinateSystem = mx; 
   }
   
-  Matrix coordinateSystem;
+  Matrix coordinateSystem, inertiaMatrix;
   
-  Vector localForce;    //force in local CS
-  //Vector appliedForce; // force in global CS
-  Vector localMomentum; // momentum in local CS
-  Vector angularSpeeds;
-  Vector angles;
+  public Vector angularSpeeds, angles;
   
-  float ix, iy, iz;
+  // resulting forces and momentums applied in this integration step (frame) to inertial mass object
+  public Vector localForce;    //force in local CS
+  //public Vector appliedForce; // (inherited) force in global CS
+  public Vector localMomentum; // momentum in local CS
+  public Vector appliedMomentum; // momentum in global CS
+  
 }
 

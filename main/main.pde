@@ -64,20 +64,21 @@ class DuoCopter extends InertialObject
   DuoCopter(float mass, Vector position, float ix, float iy, float iz)
   {
     super(mass, position, ix, iy, iz);
+    angles.x = (float) Math.PI / 4.0;
+//    angles.y = (float) Math.PI / 4;
+//    angles.z = (float) Math.PI / 4.0;
   }
   
   void update(float deltaTime)
   {
-    super.clean();
     // applying internal forces and momentum
     applyLocalForce(A);//A
     applyLocalForce(B);//B
     applyLocalMomentum(A.dotproduct(Ar));
     applyLocalMomentum(B.dotproduct(Br));
+   
+//    applyGravity();
     
-//    angles.z += 0.02;
-    
-    applyGravity();
     super.update(deltaTime);
   }
   // forces in local CS
@@ -92,36 +93,48 @@ class DuoCopter extends InertialObject
 
 DuoCopter copter = new DuoCopter(1.0, new Vector(400, 300, -130), 1.0, 1.0, 1.0);
 
+
+
 void draw()
 {
   background(0.2);
+  
+copter.clean();
+ if (keys['t']) copter.A = new Vector(0.0, -6.0, 0.0);
+ else copter.A = new Vector();
+ 
+ if (keys['y']) copter.B = new Vector(0.0, -6.0, 0.0);
+ else copter.B = new Vector();
+    
   copter.update(0.1);
-  copter.drawUp(100.0);  
+  
+  copter.drawCS(100.0, 1.0, 1.0, 1.0);
+copter.drawUp(100.0);
+drawGlobalCS(1000.0);
 }
 
-boolean[] keys = new boolean[256]; 
+boolean[] keys = new boolean[65536]; 
 
 void handleKeys(char key)
 {
-  if (key == 't' || key == 'g'){
-    if (keys['t']) {
-      copter.A = new Vector(0.0, -0.5, 0.0);
-    } else if (keys['g']) {
-      copter.A = new Vector(0.0, 0.5, 0.0);
-    } else {
-      copter.A = new Vector(0.0, 0.0, 0.0);
-    }
-  }
-  
-  if (key == 'y' || key == 'h'){
-    if (keys['y']) {
-      copter.B = new Vector(0.0, -0.5, 0.0);
-    } else if (keys['h']) {
-      copter.B = new Vector(0.0, 0.5, 0.0);
-    } else {
-      copter.B = new Vector(0.0, 0.0, 0.0);
-    }
-  }
+}
+
+void drawGlobalCS(float size)
+{
+  pushMatrix();
+    noFill();
+      beginShape(LINES);
+        stroke(1.0, 0.0, 0.0);
+        vertex(0.0, 0.0, 0.0);
+        vertex(size, 0.0, 0.0);
+        stroke(0.0, 1.0, 0.0);
+        vertex(0.0, 0.0, 0.0);
+        vertex(0.0, size, 0.0);
+        stroke(0.0, 0.0, 1.0);
+        vertex(0.0, 0.0, 0.0);
+        vertex(0.0, 0.0, size);
+      endShape();
+  popMatrix();
 }
 
 void keyReleased()

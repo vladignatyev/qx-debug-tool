@@ -35,6 +35,52 @@ class Matrix
      return result;
    }
    
+   public Matrix transposed()
+   {
+      float a, b, c, 
+           e, f, g, 
+           i, j, k;
+     a = _a;
+     b = _b;
+     c = _c;
+     e = _e;
+     f = _f;
+     g = _g;
+     i = _i;
+     j = _j;
+     k = _k;
+     return new Matrix(a, e, i, b, f, j, c, g, k);
+   }
+   
+   public Matrix transpose()
+   {
+     float a, b, c, 
+           e, f, g, 
+           i, j, k;
+     a = _a;
+     b = _b;
+     c = _c;
+     e = _e;
+     f = _f;
+     g = _g;
+     i = _i;
+     j = _j;
+     k = _k;
+     
+     _a = a;
+     _b = e;
+     _c = i;
+     _e = b;
+     _f = f;
+     _g = j;
+     _i = c;
+     _j = g;
+     _k = k;
+     return this;
+   }
+   
+   
+   
    public void multiply(Vector v, Vector result)
   {
     result.x = _a * v.x + _b * v.y + _c * v.z;
@@ -90,6 +136,11 @@ class Matrix
     _a = cosine;  _b = sine;    _c = 0.0; 
     _e = -sine;   _f = cosine;  _g = 0.0;
     _i = 0.0;     _j = 0.0;     _k = 1.0;
+  }
+  
+  public void print(String name)
+  {
+    System.out.printf("\n%s = \n %8.4f %8.4f %8.4f\n %8.4f %8.4f %8.4f\n %8.4f %8.4f %8.4f\n", name, _a, _b, _c, _e, _f, _g, _i, _j, _k);
   }
  }
 

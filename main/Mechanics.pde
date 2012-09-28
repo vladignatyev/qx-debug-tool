@@ -132,7 +132,7 @@ class InertialObject extends MassPoint
     position.add(velocity.add((coordinateSystem.multiply(localForce)).scaleBy(deltaTime * deltaTime / mass)));
     
     angularSpeeds.add((appliedMomentum.multiplied(inertiaMatrix)).scaledBy(deltaTime));
-    angularSpeeds.add(((localMomentum.multiplied(coordinateSystem)).multiplied(inertiaMatrix)).scaleBy(deltaTime));
+    angularSpeeds.add(((coordinateSystem.multiply(localMomentum)).multiplied(inertiaMatrix)).scaleBy(deltaTime));
     
     angles.add(angularSpeeds.scaledBy(deltaTime));
     

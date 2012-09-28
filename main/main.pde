@@ -101,14 +101,15 @@ void draw()
   
 copter.clean();
  if (keys['t']) {
-   copter.A = new Vector(0.0, -5.0, 0.0);
-   copter.B = new Vector(0.0, -5.001, 0.0);
+//   copter.A = new Vector(0.0, -5.0, 0.0);
+//   copter.B = new Vector(0.0, -5.001, 0.0);
+copter.applyLocalMomentum(new Vector(0.9, 0.1, 0.0));
  } else {
-   copter.A = new Vector();
-   copter.B = new Vector();
+//   copter.A = new Vector();
+//   copter.B = new Vector();
  }
    
-  copter.applyGravity();
+//  copter.applyGravity();
   copter.update(0.1);
   
   copter.drawCS(100.0, 1.0, 1.0, 1.0);

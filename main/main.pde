@@ -1,66 +1,4 @@
 /*
-class Copter
-{
-  float x, y, z = 0.0;    // position
-  float ox, oy, oz = 0.0; // angles
-  
-  private float colorR, colorG, colorB; // base color
-  
-  Copter(float r, float g, float b)
-  {
-    this.colorR = r;
-    this.colorG = g;
-    this.colorB = b;
-  }
-  
-  void update(float deltaTime)
-  {
-    ox = ox + 0.02;
-    oy = oy + 0.03;
-    oz = oz + 0.04;
-  }
-  
-  abstract void draw();
-//    noStroke();
-//    pushMatrix();
-//    translate(x, y, z);
-//    
-//    beginShape(QUADS);
-//      fill (colorR, colorG, colorB); 
-//      vertex(-10, -10, 1);
-//      vertex(-10,  10, 1);
-//      vertex( 10,  10, 1);
-//      vertex( 10, -10, 1);
-//    endShape(); 
-//    
-//    popMatrix();
-  /*
-  void drawCS(float size) // draw coordinate system of this copter
-  {
-    pushMatrix();
-      translate(x, y, z);
-      rotateX(ox);
-      rotateY(oy);
-      rotateZ(oz);
-      beginShape(LINES);
-      stroke(1,0,0);
-      vertex(0,0,0);
-      vertex(size,0,0);
-
-      stroke(0,1,0);
-      vertex(0,0,0);
-      vertex(0,size,0);
-      stroke(0,0,1);
-      vertex(0,0,0);
-      vertex(0,0,size);   
-      endShape();
-    popMatrix();
-  }
-}
-*/
-
-
-/*
 class Engine
 { 
   Engine (Vector traction, float maxTraction, float maxTorsion, float maxRevolutions)
@@ -113,8 +51,6 @@ class Engine
   }
 }
 
-//Copter copter = new QuadroCopter(1.0, 0.0, 0.0);
-
 //Engine e = new Engine(new Vector(), );
 */
 void setup()
@@ -130,55 +66,72 @@ class DuoCopter extends InertialObject
     super(mass, position, ix, iy, iz);
   }
   
-  
-  /*
-  
-  ^ A                     ^ B
-  |                       |
-  *-----------------------*
-              |
-              |
-              V mg
-  
-  */
   void update(float deltaTime)
   {
     super.clean();
-    applyForce(A);//A
-    applyForce(B);//B
-    applyMomentum(A.dotproduct(Ar));
-    applyMomentum(B.dotproduct(Br));
+    // applying internal forces and momentum
+    applyLocalForce(A);//A
+    applyLocalForce(B);//B
+    applyLocalMomentum(A.dotproduct(Ar));
+    applyLocalMomentum(B.dotproduct(Br));
+    
+//    angles.z += 0.02;
+    
+    applyGravity();
     super.update(deltaTime);
   }
+  // forces in local CS
+  Vector A = new Vector(0.0, 0.0, 0.0);
+  Vector B = new Vector(0.0, 0.0, 0.0);
   
-  Vector A = new Vector(0.0, 2.0, 0.0);
-  Vector B = new Vector(0.0, 1.0, 0.0);
+  // force A radius vector
   Vector Ar = new Vector(1.0, 0.0, 0.0);
   Vector Br = new Vector(-1.0, 0.0, 0.0);
+  
 }
 
-//InertialObject m = new InertialObject (1.0, new Vector(400, 0,-30), 10.0, 1.0, 1.0);
-DuoCopter copter = new DuoCopter(1.0, new Vector(400, 0, -30), 1.0, 1.0, 1.0);
-Boolean down = false;
+DuoCopter copter = new DuoCopter(1.0, new Vector(400, 300, -130), 1.0, 1.0, 1.0);
+
 void draw()
 {
   background(0.2);
   copter.update(0.1);
-  copter.drawCS(100, 1.0, 0.0, 0.0);
+  copter.drawUp(100.0);  
+}
+
+boolean[] keys = new boolean[256]; 
+
+void handleKeys(char key)
+{
+  if (key == 't' || key == 'g'){
+    if (keys['t']) {
+      copter.A = new Vector(0.0, -0.5, 0.0);
+    } else if (keys['g']) {
+      copter.A = new Vector(0.0, 0.5, 0.0);
+    } else {
+      copter.A = new Vector(0.0, 0.0, 0.0);
+    }
+  }
+  
+  if (key == 'y' || key == 'h'){
+    if (keys['y']) {
+      copter.B = new Vector(0.0, -0.5, 0.0);
+    } else if (keys['h']) {
+      copter.B = new Vector(0.0, 0.5, 0.0);
+    } else {
+      copter.B = new Vector(0.0, 0.0, 0.0);
+    }
+  }
 }
 
 void keyReleased()
 {
-   if (key == 't')
-  { 
-    down = false; 
-  }
+  keys[key] = false;
+  handleKeys(key);
 }
-// key up handler
+
 void keyPressed()
 {
-  if (key == 't')
-  { 
-    down = true; 
-  }
+  keys[key] = true;
+  handleKeys(key);
 }

@@ -25,13 +25,10 @@ class MassPoint
     appliedForce.add(force);
   }
   
-  /**
-   * Apply gravity in CS of object
-   */
-  void applyGravity(Vector direction)
+  void applyGravity(Vector down)
   {
-    final float g = 9.81;
-    applyForce(gravity.scaledBy(mass*g));
+    final float g = 9.81; 
+    applyForce(down.scaledBy(mass*g)); 
   }
   
   void drawCS (float size, float r, float g, float b)
@@ -102,38 +99,64 @@ class InertialObject extends MassPoint
     this.iz = iz;
     angles = new Vector(0.0,0.0,0.0);
     angularSpeeds = new Vector(0.0,0.0,0.0);
-    appliedMomentum = new Vector(0.0,0.0,0.0);
-    coordinateSystem = new Matrix( 1.0, 0.0, 0.0, 
-                                   0.0, 1.0, 0.0,
-                                   0.0, 0.0, 1.0);
+    localMomentum = new Vector(0.0,0.0,0.0);
+    localForce = new Vector(0.0, 0.0, 0.0);
   }
   
   void clean()
   {
     super.clean();
     
-    appliedMomentum.x = 0.0;
-    appliedMomentum.y = 0.0;
-    appliedMomentum.z = 0.0;
+    localMomentum.x = 0.0;
+    localMomentum.y = 0.0;
+    localMomentum.z = 0.0;
+    
+    localForce.x = 0.0;
+    localForce.y = 0.0;
+    localForce.z = 0.0;
+  }
+  
+  void applyLocalForce(Vector force) // force in global CS
+  {
+    localForce.add(force);
   }
   
   void update(float deltaTime)
   {
-    super.update(deltaTime);
+    updateCS();
     
-    final float omegaX = appliedMomentum.x / ix;
-    final float omegaY = appliedMomentum.y / iy;
-    final float omegaZ = appliedMomentum.z / iz;
+    position.add(velocity.add(appliedForce.scaleBy(deltaTime * deltaTime / mass)));
+    position.add(velocity.add(localForce.multiplied(coordinateSystem).scaleBy(deltaTime * deltaTime / mass)));
+    
+    final float omegaX = localMomentum.x / ix;
+    final float omegaY = localMomentum.y / iy;
+    final float omegaZ = localMomentum.z / iz;
     
     angularSpeeds.add(new Vector(omegaX, omegaY, omegaZ).scaleBy(deltaTime));
     angles.add(angularSpeeds.scaledBy(deltaTime));
   }
   
-  void applyMomentum(Vector momentum)
+  void applyLocalMomentum(Vector momentum)
   {
-    appliedMomentum.add(momentum);
+    localMomentum.add(momentum);
   } 
   
+  void drawUp(float size)
+  {
+    pushMatrix();
+      translate(position.x, position.y, position.z);
+      Vector localUp = new Vector(0, -1, 0);
+      Vector globalUp = localUp.multiplied(coordinateSystem).scaleBy(size);
+      noFill();
+      beginShape(LINES);
+        stroke(1.0, 0.0, 0.0);
+        vertex(0.0, 0.0, 0.0);
+        vertex(globalUp.x, globalUp.y, globalUp.z);
+        vertex(globalUp.x, globalUp.y, globalUp.z);
+        vertex(globalUp.x+size/8.0, globalUp.y, globalUp.z);
+      endShape();
+    popMatrix();    
+  }  
   void drawCS(float size, float r, float g, float b)
   {
     pushMatrix();
@@ -190,17 +213,35 @@ class InertialObject extends MassPoint
     popMatrix();
   }
   
-  /**
-   * Update CS of object
-   */
+  void applyGravity()
+  {
+    final float g = 9.81; 
+    applyForce((new Vector(0.0, 1.0, 0.0)).scaleBy(mass * g));
+  }
+
   void updateCS()
   {
-    final float x = (float) (Math.cos(angles.x)); //todo:
+    Matrix mx = new Matrix(); 
+    mx.rotationX(angles.x);
+    
+    Matrix my = new Matrix();
+    my.rotationY(angles.y);
+    
+    Matrix mz = new Matrix();
+    mz.rotationZ(angles.z);
+    
+    // mx*my*mz
+    mx.multiplyBy(my);
+    mx.multiplyBy(mz);
+    
+    coordinateSystem = mx; 
   }
   
   Matrix coordinateSystem;
   
-  Vector appliedMomentum;
+  Vector localForce;    //force in local CS
+  //Vector appliedForce; // force in global CS
+  Vector localMomentum; // momentum in local CS
   Vector angularSpeeds;
   Vector angles;
   

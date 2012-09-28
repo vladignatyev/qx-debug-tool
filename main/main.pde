@@ -64,7 +64,7 @@ class DuoCopter extends InertialObject
   DuoCopter(float mass, Vector position, float ix, float iy, float iz)
   {
     super(mass, position, ix, iy, iz);
-    angles.x = (float) Math.PI / 4.0;
+//    angles.x = (float) Math.PI / 4.0;
 //    angles.y = (float) Math.PI / 4;
 //    angles.z = (float) Math.PI / 4.0;
   }
@@ -82,8 +82,8 @@ class DuoCopter extends InertialObject
     super.update(deltaTime);
   }
   // forces in local CS
-  Vector A = new Vector(0.0, 0.0, 0.0);
-  Vector B = new Vector(0.0, 0.0, 0.0);
+  Vector A = new Vector();
+  Vector B = new Vector();
   
   // force A radius vector
   Vector Ar = new Vector(1.0, 0.0, 0.0);
@@ -100,12 +100,15 @@ void draw()
   background(0.2);
   
 copter.clean();
- if (keys['t']) copter.A = new Vector(0.0, -6.0, 0.0);
- else copter.A = new Vector();
- 
- if (keys['y']) copter.B = new Vector(0.0, -6.0, 0.0);
- else copter.B = new Vector();
-    
+ if (keys['t']) {
+   copter.A = new Vector(0.0, -5.0, 0.0);
+   copter.B = new Vector(0.0, -5.001, 0.0);
+ } else {
+   copter.A = new Vector();
+   copter.B = new Vector();
+ }
+   
+  copter.applyGravity();
   copter.update(0.1);
   
   copter.drawCS(100.0, 1.0, 1.0, 1.0);

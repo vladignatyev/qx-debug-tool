@@ -1,52 +1,101 @@
+class EngineSound
+{
+  //todo implement for debugging purpose
+}
+
 class Engine
 { 
-  Engine (Vector traction, float maxTraction, float maxTorsion, float maxRevolutions)
-  {
-    _traction = traction;
-    _torsion = traction.normalized().negatiate();
-    torsionValue = 0.0;
-    tractionValue = 0.0;
+  
+  /** position relative to the mass center*/
+  Engine (Vector position, float maxTraction, float maxTorsion, float maxRevolutions, float revolutionDirection)
+  { 
     this.maxTorsion = maxTorsion;
     this.maxTraction = maxTraction;
     this.maxRevolutions = maxRevolutions;
-    this.engineSpeedRevolutions = 0.0;
+    
+    leverPosition = 0.0;
+    engineSpeedRevolutions = 0.0;
+    this.position = position;
+    
+    _revolutionDirection = revolutionDirection > 0 ? 1.0 : -1.0 ;
   }
   
-  Vector _traction;
-  Vector _torsion;
-  float tractionValue;
-  float torsionValue;
-  float maxTorsion;
-  float maxTraction;
-  float maxRevolutions;
+  float maxTorsion, maxTraction, maxRevolutions;
   float engineSpeedRevolutions;
+  public float leverPosition;
   
-  void updateState()
+  public Vector momentum;
+  public Vector force;
+  public Vector position;
+  
+  float _revolutionDirection;
+  
+  void update(float deltaTime)
   {
-    final float rate = engineSpeedRevolutions / maxRevolutions;
-    torsionValue = maxTorsion * rate;
-    tractionValue = maxTraction * rate;
+    engineSpeedRevolutions = leverPosition * maxRevolutions;
+    
+    final Vector up = new Vector(0.0, -1.0, 0.0);
+    final Vector torsion = up.scaledBy(leverPosition * maxTorsion * _revolutionDirection);
+    force = up.scaledBy(leverPosition * maxTraction);
+        
+    momentum = torsion.add(force.dotProduct(position)); 
   }
   
-  
-  public Vector getTraction()
+  void setLever(float newValue)
   {
-    return _traction.scaledBy(tractionValue);
+    if (newValue >= 0.0 && newValue <= 1.0){
+      leverPosition = newValue;
+    } else if (newValue < 0.0) {
+      leverPosition = 0.0;
+    } else if (newValue > 1.0) {
+      leverPosition = 1.0;
+    }
+  }
+}
+
+class Copter extends InertialObject
+{
+  Copter (float mass, Vector position, float ix, float iy, float iz,
+          ArrayList<Engine> engines) 
+  {
+    super(mass, position, ix, iy, iz);
+    
+    this.engines = engines;
   }
   
-  public Vector getTorsion()
+  ArrayList<Engine> engines;
+  
+  void update (float deltaTime)
   {
-    return _torsion.scaledBy(torsionValue);
+    for (int i = 0; i < this.engines.size(); i++)
+    {
+      Engine e = this.engines.get(i);
+      e.update(deltaTime);
+      
+      applyLocalForce(e.force);
+      applyLocalMomentum(e.momentum);
+    }
+    
+    applyGravity();
+    super.update(deltaTime);
   }
   
-  void setRate(float value)
+  void setEngineLever(int engineId, float position) {
+    Engine engine = this.engines.get(engineId);
+    engine.setLever(position);
+  }
+  
+  void print(String name)
   {
-    if (value > maxRevolutions)
-      engineSpeedRevolutions = value;
-    else if (value < 0.0)
-      engineSpeedRevolutions = 0.0;
-    else
-      engineSpeedRevolutions = value;
+    System.out.printf("Copter [%s]:\n", name);
+    for (int i = 0; i < this.engines.size(); i++)
+    {
+      Engine e = this.engines.get(i);
+      System.out.printf("  Engine # %i:\n", i);
+      System.out.printf("     Lever position: %f\n", e.leverPosition);
+          e.force.print("     Force:");
+       e.momentum.print("     Momentum:");
+    }
   }
 }
 

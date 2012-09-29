@@ -76,7 +76,7 @@ public class Vector
     return new Vector(x - v.x, y - v.y, z - v.z);
   }
   
-  public Vector dotproduct(Vector v)
+  public Vector dotProduct(Vector v)
   {
     return new Matrix(0.0,   -z,   y,
                  z,  0.0,  -x,

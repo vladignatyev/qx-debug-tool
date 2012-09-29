@@ -127,16 +127,22 @@ class InertialObject extends MassPoint
   void update(float deltaTime)
   {
     updateCS();
-    
-    position.add(velocity.add(appliedForce.scaleBy(deltaTime * deltaTime / mass)));
-    position.add(velocity.add((coordinateSystem.multiply(localForce)).scaleBy(deltaTime * deltaTime / mass)));
+
+    velocity.add(appliedForce.scaleBy(deltaTime * deltaTime / mass));
+    velocity.add((coordinateSystem.multiply(localForce)).scaleBy(deltaTime * deltaTime / mass));
+    if (velocity.length() < 0.001) { //to prevent sliding
+      velocity.x = 0.0;
+      velocity.y = 0.0;
+      velocity.z = 0.0;
+    }
+
+    position.add(velocity);
     
     angularSpeeds.add((appliedMomentum.multiplied(inertiaMatrix)).scaledBy(deltaTime));
     angularSpeeds.add(((coordinateSystem.multiply(localMomentum)).multiplied(inertiaMatrix)).scaleBy(deltaTime));
     
     angles.add(angularSpeeds.scaledBy(deltaTime));
     
-    angles.print("angles");
   }
   
   void applyLocalMomentum(Vector momentum)
@@ -223,7 +229,7 @@ class InertialObject extends MassPoint
   
   void applyGravity()
   {
-    final float g = 0.981; 
+    final float g = 9.81; 
     applyForce((new Vector(0.0, 1.0, 0.0)).scaleBy(mass * g));
   }
 

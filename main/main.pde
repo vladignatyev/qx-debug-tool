@@ -1,65 +1,62 @@
+Copter copter;
+float baseEngineLevel = 0.5;
+float engineMouseSensitivity = 0.01;
+float engine1 = 0.0;
+float engine2 = 0.0;
+float engine3 = 0.0;
+float engine4 = 0.0;
+
+int viewWidth = 800;
+int viewHeight = 600;
+
 void setup()
 {
-  size (800, 600, P3D);
+  size (viewWidth, viewHeight, P3D);
   colorMode(RGB, 1); 
+  
+  copter = new Copter(1.0, new Vector(400, 300, -130), 1.0, 1.0, 1.0,
+                           new ArrayList<Engine>(){{
+                             add(new Engine(new Vector(-1.0, 0.0, -1.0), 2.4526 * 2.0, 0.1, 1000, 1.0));
+                             add(new Engine(new Vector( 1.0, 0.0, -1.0), 2.4526 * 2.0, 0.1, 1000, -1.0));
+                             add(new Engine(new Vector( 1.0, 0.0,  1.0), 2.4526 * 2.0, 0.1, 1000, -1.0));
+                             add(new Engine(new Vector(-1.0, 0.0,  1.0), 2.4526 * 2.0, 0.1, 1000, 1.0));
+                           }});
+  updateEnginesLevers();
 }
 
-class DuoCopter extends InertialObject
+void updateEnginesLevers()
 {
-  DuoCopter(float mass, Vector position, float ix, float iy, float iz)
-  {
-    super(mass, position, ix, iy, iz);
-//    angles.x = (float) Math.PI / 4.0;
-//    angles.y = (float) Math.PI / 4;
-//    angles.z = (float) Math.PI / 4.0;
-  }
-  
-  void update(float deltaTime)
-  {
-    // applying internal forces and momentum
-    applyLocalForce(A);//A
-    applyLocalForce(B);//B
-    applyLocalMomentum(A.dotproduct(Ar));
-    applyLocalMomentum(B.dotproduct(Br));
-   
-//    applyGravity();
-    
-    super.update(deltaTime);
-  }
-  // forces in local CS
-  Vector A = new Vector();
-  Vector B = new Vector();
-  
-  // force A radius vector
-  Vector Ar = new Vector(1.0, 0.0, 0.0);
-  Vector Br = new Vector(-1.0, 0.0, 0.0);
-  
+  copter.setEngineLever(0, baseEngineLevel + engine1);
+  copter.setEngineLever(1, baseEngineLevel + engine2);
+  copter.setEngineLever(2, baseEngineLevel + engine3);
+  copter.setEngineLever(3, baseEngineLevel + engine4);
 }
-
-DuoCopter copter = new DuoCopter(1.0, new Vector(400, 300, -130), 1.0, 1.0, 1.0);
-
-
 
 void draw()
 {
   background(0.2);
-  
-copter.clean();
+  copter.clean();
  if (keys['t']) {
-   copter.A = new Vector(0.0, -1.0, 0.0);
-   copter.B = new Vector(0.0, -1.001, 0.0);
-//copter.applyLocalMomentum(new Vector(0.9, 0.1, 0.0));
+   baseEngineLevel = 1.0;
+ } else if (keys['g']) {
+   baseEngineLevel = 0.4;
  } else {
-   copter.A = new Vector();
-   copter.B = new Vector();
+   baseEngineLevel = 0.5;
  }
+ 
+ 
+ if (keys['u']) engine1 = engineMouseSensitivity; else engine1 = 0.0;
+ if (keys['i']) engine2 = engineMouseSensitivity; else engine2 = 0.0;
+ if (keys['k']) engine3 = engineMouseSensitivity; else engine3 = 0.0;
+ if (keys['j']) engine4 = engineMouseSensitivity; else engine4 = 0.0;
+ 
+ updateEnginesLevers();
    
-  copter.applyGravity();
   copter.update(0.1);
   
   copter.drawCS(100.0, 1.0, 1.0, 1.0);
-copter.drawUp(100.0);
-drawGlobalCS(1000.0);
+  copter.drawUp(100.0);
+  drawGlobalCS(1000.0);
 }
 
 boolean[] keys = new boolean[65536]; 

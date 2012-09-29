@@ -44,12 +44,11 @@ void draw()
    baseEngineLevel = 0.5;
  }
  
- 
- if (keys['u']) engine1 = engineMouseSensitivity; else engine1 = 0.0;
- if (keys['i']) engine2 = engineMouseSensitivity; else engine2 = 0.0;
- if (keys['k']) engine3 = engineMouseSensitivity; else engine3 = 0.0;
- if (keys['j']) engine4 = engineMouseSensitivity; else engine4 = 0.0;
- 
+ engine1 = keys['u']? engineMouseSensitivity : (keys['w']? -engineMouseSensitivity : 0.0);
+ engine2 = keys['i']? engineMouseSensitivity : (keys['e']? -engineMouseSensitivity : 0.0);
+ engine3 = keys['k']? engineMouseSensitivity : (keys['s']? -engineMouseSensitivity : 0.0);
+ engine4 = keys['j']? engineMouseSensitivity : (keys['d']? -engineMouseSensitivity : 0.0);
+  
  updateEnginesLevers();
    
   copter.update(0.1);

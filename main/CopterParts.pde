@@ -78,6 +78,7 @@ class Copter extends InertialObject
     
     applyGravity();
     super.update(deltaTime);
+    print("Copter");
   }
   
   void setEngineLever(int engineId, float position) {
@@ -91,7 +92,7 @@ class Copter extends InertialObject
     for (int i = 0; i < this.engines.size(); i++)
     {
       Engine e = this.engines.get(i);
-      System.out.printf("  Engine # %i:\n", i);
+//      System.out.printf("  Engine # %u:\n", i);
       System.out.printf("     Lever position: %f\n", e.leverPosition);
           e.force.print("     Force:");
        e.momentum.print("     Momentum:");

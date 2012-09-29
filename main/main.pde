@@ -46,8 +46,8 @@ void draw()
  
  engine1 = keys['u']? engineMouseSensitivity : (keys['w']? -engineMouseSensitivity : 0.0);
  engine2 = keys['i']? engineMouseSensitivity : (keys['e']? -engineMouseSensitivity : 0.0);
- engine3 = keys['k']? engineMouseSensitivity : (keys['s']? -engineMouseSensitivity : 0.0);
- engine4 = keys['j']? engineMouseSensitivity : (keys['d']? -engineMouseSensitivity : 0.0);
+ engine3 = keys['k']? engineMouseSensitivity : (keys['d']? -engineMouseSensitivity : 0.0);
+ engine4 = keys['j']? engineMouseSensitivity : (keys['s']? -engineMouseSensitivity : 0.0);
   
  updateEnginesLevers();
    

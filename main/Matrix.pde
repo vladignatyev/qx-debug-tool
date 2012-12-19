@@ -52,7 +52,7 @@ class Matrix
      return new Matrix(a, e, i, b, f, j, c, g, k);
    }
    
-   public Matrix transpose()
+  /* public Matrix transpose()
    {
      float a, b, c, 
            e, f, g, 
@@ -77,7 +77,7 @@ class Matrix
      _j = g;
      _k = k;
      return this;
-   }
+   }*/
    
    
    

@@ -1,4 +1,4 @@
-import processing.serial.*;
+/*import processing.serial.*;
 import processing.serial.Serial; // serial library
 import controlP5.*;// controlP5 library
 import processing.opengl.*; 
@@ -82,12 +82,12 @@ void draw2() {
   case 12: magxDData.addVal(float(inputStringArr[2]));break;//стандартное отклонение по X
   case 13: magyDData.addVal(float(inputStringArr[2]));break;//стандартное отклонение по Y
   case 14: magzDData.addVal(float(inputStringArr[2]));break;//стандартное отклонение по Z
- /* case 15: break;//мат ожид
+  case 15: break;//мат ожид
   case 16: break;
   case 17: break;
   case 18: magxDData.addVal(float(inputStringArr[2])); break;
   case 19: magyDData.addVal(float(inputStringArr[2]));break;
-  case 20: magzDData.addVal(float(inputStringArr[2]));break;*/
+  case 20: magzDData.addVal(float(inputStringArr[2]));break;
   default:  print("Err ch is:");println(ch); break; //исключения выпадать должны здесь
 } 
   

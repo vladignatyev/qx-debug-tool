@@ -53,6 +53,14 @@ public class Vector
     z = z * value;
     return this;
   }
+  
+  public Vector divisioneBy(float value)
+  {
+    x = x / value;
+    y = y / value;
+    z = z / value;
+    return this;
+  }
    
   public float length()
   {
@@ -113,10 +121,10 @@ public class Vector
     return this;
   }
   
-  public Vector addFloat (float a, float b, float c)
+/*  public Vector addFloat (float a, float b, float c)
   {
     return new Vector(x + a, y + b, z + c);
-  }
+  }*/
   
   public Vector subtracted(Vector v)
   {

@@ -1,3 +1,18 @@
+import controlP5.*; // controlP5 library
+ControlP5 controlP5;
+color red_ = color(120, 30, 30);
+
+Button buttonRESET;
+
+public void bRESET() {
+  copter.clean();
+  copter.position = new Vector(400, 300, -230);
+  copter.lineAcceleration = new Vector(0.0,0.0,0.0);
+  copter.angularAcceleration = new Vector(0.0,0.0,0.0);
+  copter.velocity = new Vector(0.0,0.0,0.0);
+  copter.angularSpeeds = new Vector(0.0,0.0,0.0);
+  copter.angles = new Vector(0.0,0.0,0.0); 
+}
 /*import processing.serial.*;
 import processing.serial.Serial; // serial library
 import controlP5.*;// controlP5 library
